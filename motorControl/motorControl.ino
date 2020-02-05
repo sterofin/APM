@@ -22,36 +22,39 @@ void setup() {
 
 String power = "STOP";
 void loop() {
-//  int potValue = analogRead(A0); // Read potentiometer value
-//  int pwmOutput = map(potValue, 0, 1023, 0 , 255); // Map the potentiometer value from 0 to 255
-  while(Serial.available()==0){}
-  String power = Serial.readString();
-  
-  analogWrite(enA, 255); // Send PWM signal to L298N Enable pin
-  analogWrite(enB, 255); // Send PWM signal to L298N Enable pin
-  if (power.equals("UP\n")) {
-    digitalWrite(in1, HIGH);
-    digitalWrite(in2, LOW);
-    digitalWrite(in3, HIGH);
-    digitalWrite(in4, LOW);
-    Serial.println("UP");
-    delay(20);
-  }
-  if (power.equals("DOWN\n")) {
+  int pwmOutputA, pwmOutputB;
+  int potValue;
+
+  potValue = analogRead(A0); // Read potentiometer value
+  pwmOutputA = map(potValue, 0, 1023, 0 , 255); // Map the potentiometer value from 0 to 255
+  //pwmOutputB = map(potValue, 0, 1023, 100 , 355);
+
+  if (pwmOutputA < 120) {
+    pwmOutputA = -(pwmOutputA - 120)*2;
     digitalWrite(in1, LOW);
     digitalWrite(in2, HIGH);
     digitalWrite(in3, LOW);
     digitalWrite(in4, HIGH);
     Serial.println("DOWN");
     delay(20);
-  }
-  if (power.equals("STOP\n")){
+  } else if (pwmOutputA > 134) {
+    digitalWrite(in1, HIGH);
+    digitalWrite(in2, LOW);
+    digitalWrite(in3, HIGH);
+    digitalWrite(in4, LOW);
+    Serial.println("UP");
+    delay(20);
+  } else {
     analogWrite(enA, 127); // Send PWM signal to L298N Enable pin
     analogWrite(enB, 127); // Send PWM signal to L298N Enable pin
     digitalWrite(in1, LOW);
     digitalWrite(in2, LOW);
-//    digitalWrite(in3, LOW);
-//    digitalWrite(in4, LOW);
+    digitalWrite(in3, LOW);
+    digitalWrite(in4, LOW);
     Serial.println("STOP");
   }
+
+  analogWrite(enA, pwmOutputA); // Send PWM signal to L298N Enable pin
+  //analogWrite(enB, pwmOutputB); // Send PWM signal to L298N Enable pin
+  Serial.println(pwmOutputA);
 }
